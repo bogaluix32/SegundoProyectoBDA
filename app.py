@@ -1,14 +1,13 @@
 # Importar las librerías necesarias
 import streamlit as st
 import pandas as pd
-import database
+import database as db
 import Normalizacion_19_10_15h_55m as normalizacion
+import CrearArchivosParaNodos
 
 columnasArchivo1 = ["Aportación del beneficiario", "Nombre de la agrupación homogénea del producto sanitario", "Diagnóstico hospitalario", "Especial control médico"]
 columnasArchivo4 = ["ATC", "Forma Farmacéutica", "detalles del producto", "Tamaño de Caja o presentación"]
 columnasArchivo5 = ["MES","FECHA","TIPO","UNIDAD","PIEZAS SOLICITADAS","PIEZAS SURTIDAS"]
-
-
 
 # Función para cargar y procesar archivos CSV
 def cargar_archivos_csv():
@@ -63,7 +62,24 @@ def cargar_archivos_csv():
             nuevoArchivo5.to_csv(nombre_archivo_limpio5, index=False)
             print("Normalizacion de archivo 5")
 
+            #Creamos los archivos que necesitamos para los nodos
+            CrearArchivosParaNodos.crearArchivoMedicamentos()
+            print("Archivo para el nodo medicamentos creado con éxito")
+
+            # Llama a la función para validar la conexión
+            if db.validarConexionNeo4j():
+                # Realiza otras operaciones si la conexión es exitosa
+                print("La conexión es válida, puedes realizar otras operaciones en Neo4j.")
+            else:
+                # Maneja el caso en el que la conexión no sea válida
+                print("No se pudo validar la conexión a Neo4j.")
+
+            #Creamos los nodos medicamentos en neo4j
+            db.crearNodoMedicamento()
+            print("Nodos Medicamentos creados con éxito")
+
             # Aquí podrías realizar más operaciones con el DataFrame df si lo deseas
+
         else:
             st.warning("Por favor, suba los archivos CSV primero.")  # Mensaje de advertencia si no se cargaron archivos
 
