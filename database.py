@@ -6,7 +6,7 @@ import streamlit as st
 URI = "bolt://localhost:7687"
 AUTH = ("neo4j","123456789")
 
-#funcion que define la consulta a ejcutar en neo
+#funcion que define la consulta a ejcutar en neo para crear nodo Medicamento
 def crear_nodo(tx, etiqueta, datos):
     query = (
         f"CREATE (n:`{etiqueta}` {{"
@@ -25,7 +25,7 @@ def crear_nodo(tx, etiqueta, datos):
     )
     tx.run(query)
 
-#función para crear un nodo en la base de datos
+#función para crear un nodo Medicamento en la base de datos
 def crearNodoMedicamento():
     # Abre una conexión a la base de datos
     with GraphDatabase.driver(URI, auth=AUTH) as driver:
@@ -74,3 +74,136 @@ def validarConexionNeo4j():
     except Exception as e:
         print(f"Error de conexión: {str(e)}")
         return False
+
+#funcion que define la consulta a ejcutar en neo para crear nodo Principio Activo
+def crear_nodoPrincipioActivo(tx, etiqueta, datos):
+    query = (
+        f"CREATE (n:`{etiqueta}` {{"
+        f"Nombre: '{datos['Descripción Principio Activo']}'"
+        "})"
+    )
+    tx.run(query)
+
+#función para crear un nodo Principio Activo en la base de datos
+def crearNodoPrincipioActivo():
+    # Abre una conexión a la base de datos
+    with GraphDatabase.driver(URI, auth=AUTH) as driver:
+        # Abre una sesión de Neo4j
+        with driver.session() as session:
+            # Lee los datos del archivo unificado csv y crea nodos en la base de datos
+            with open(r'C:\\Users\\Luis Antonio Jimenez\OneDrive - Estudiantes ITCR\\TEC\\ATI\\Semestre 6\\Bases de Datos Avanzadas\\Proyecto Programado 2\\datos\\nodos\\ArchivoNodoPrincipiosActivos.csv', 'r') as file:
+                # Procesa el archivo CSV y crea nodos
+                for line in file.readlines()[:20]: #leemos los primeros 20 registros
+                    etiqueta = "PrincipioActivo"  # definimos la etiqueta del nodo
+                    datos_dict = { #cargamos los atributos del nodo mediante un diccionario
+                        'Descripción Principio Activo' : line #datos[x] para acceder a cada dato del los registros, recordemos que el registro es una tupla.
+                    }
+                    # Llama a la función para crear el nodo
+                    session.write_transaction(crear_nodoPrincipioActivo, etiqueta, datos_dict)
+
+#funcion que define la consulta a ejcutar en neo para crear nodo Laboratorio Oferente
+def crear_nodoLaboratorioOferente(tx, etiqueta, datos):
+    query = (
+        f"CREATE (n:`{etiqueta}` {{"
+        f"Nombre: '{datos['Nombre del laboratorio ofertante']}'"
+        "})"
+    )
+    tx.run(query)
+
+#función para crear un nodo Laboratprio Oferente en la base de datos
+def crearNodoLaboratorioOferente():
+    # Abre una conexión a la base de datos
+    with GraphDatabase.driver(URI, auth=AUTH) as driver:
+        # Abre una sesión de Neo4j
+        with driver.session() as session:
+            # Lee los datos del archivo unificado csv y crea nodos en la base de datos
+            with open(r'C:\\Users\\Luis Antonio Jimenez\OneDrive - Estudiantes ITCR\\TEC\\ATI\\Semestre 6\\Bases de Datos Avanzadas\\Proyecto Programado 2\\datos\\nodos\\ArchivoNodoLaboratorioOferente.csv', 'r') as file:
+                # Procesa el archivo CSV y crea nodos
+                for line in file.readlines()[:20]: #leemos los primeros 20 registros
+                    etiqueta = "LaboratorioOferente"  # definimos la etiqueta del nodo
+                    datos_dict = { #cargamos los atributos del nodo mediante un diccionario
+                        'Nombre del laboratorio ofertante' : line #datos[x] para acceder a cada dato del los registros, recordemos que el registro es una tupla.
+                    }
+                    # Llama a la función para crear el nodo
+                    session.write_transaction(crear_nodoLaboratorioOferente, etiqueta, datos_dict)
+
+#funcion que define la consulta a ejcutar en neo para crear nodo Departamento
+def crear_nodoDepartamento(tx, etiqueta, datos):
+    query = (
+        f"CREATE (n:`{etiqueta}` {{"
+        f"Nombre: '{datos['SERVICIO']}'"
+        "})"
+    )
+    tx.run(query)
+
+#función para crear un nodo Departamento en la base de datos
+def crearNodoDepartamento():
+    # Abre una conexión a la base de datos
+    with GraphDatabase.driver(URI, auth=AUTH) as driver:
+        # Abre una sesión de Neo4j
+        with driver.session() as session:
+            # Lee los datos del archivo unificado csv y crea nodos en la base de datos
+            with open(r'C:\\Users\\Luis Antonio Jimenez\OneDrive - Estudiantes ITCR\\TEC\\ATI\\Semestre 6\\Bases de Datos Avanzadas\\Proyecto Programado 2\\datos\\nodos\\ArchivoNodoDepartamento.csv', 'r') as file:
+                # Procesa el archivo CSV y crea nodos
+                for line in file.readlines()[:20]: #leemos los primeros 20 registros
+                    etiqueta = "Departamento"  # definimos la etiqueta del nodo
+                    datos_dict = { #cargamos los atributos del nodo mediante un diccionario
+                        'SERVICIO' : line #datos[x] para acceder a cada dato del los registros, recordemos que el registro es una tupla.
+                    }
+                    # Llama a la función para crear el nodo
+                    session.write_transaction(crear_nodoDepartamento, etiqueta, datos_dict)
+
+#funcion que define la consulta a ejcutar en neo para crear nodo Fabricante
+def crear_nodoFabricante(tx, etiqueta, datos):
+    query = (
+        f"CREATE (n:`{etiqueta}` {{"
+        f"Nombre: '{datos['Fabricante']}'"
+        "})"
+    )
+    tx.run(query)
+
+#función para crear un nodo Fabricante en la base de datos
+def crearNodoFabricante():
+    # Abre una conexión a la base de datos
+    with GraphDatabase.driver(URI, auth=AUTH) as driver:
+        # Abre una sesión de Neo4j
+        with driver.session() as session:
+            # Lee los datos del archivo unificado csv y crea nodos en la base de datos
+            with open(r'C:\\Users\\Luis Antonio Jimenez\OneDrive - Estudiantes ITCR\\TEC\\ATI\\Semestre 6\\Bases de Datos Avanzadas\\Proyecto Programado 2\\datos\\nodos\\ArchivoNodoFabricantes.csv', 'r') as file:
+                # Procesa el archivo CSV y crea nodos
+                for line in file.readlines()[:20]: #leemos los primeros 20 registros
+                    etiqueta = "Fabricante"  # definimos la etiqueta del nodo
+                    datos_dict = { #cargamos los atributos del nodo mediante un diccionario
+                        'Fabricante' : line #datos[x] para acceder a cada dato del los registros, recordemos que el registro es una tupla.
+                    }
+                    # Llama a la función para crear el nodo
+                    session.write_transaction(crear_nodoFabricante, etiqueta, datos_dict)
+
+#funcion que define la consulta a ejcutar en neo para crear nodo Categoria Medicamentos
+def crear_nodoCategoriaMedicamentos(tx, etiqueta, datos):
+    query = (
+        f"CREATE (n:`{etiqueta}` {{"
+        f"GRUPO: '{datos['GRUPO']}', "
+        f"DESCRIPCIÓN: '{datos['DESCRIPCIÓN']}'"
+        "})"
+    )
+    tx.run(query)
+
+#función para crear un nodo Categoria Medicamentos en la base de datos
+def crearNodoCategoriaMedicamentos():
+    # Abre una conexión a la base de datos
+    with GraphDatabase.driver(URI, auth=AUTH) as driver:
+        # Abre una sesión de Neo4j
+        with driver.session() as session:
+            # Lee los datos del archivo_unificado.csv y crea nodos en la base de datos
+            with open(r'C:\\Users\\Luis Antonio Jimenez\OneDrive - Estudiantes ITCR\\TEC\\ATI\\Semestre 6\\Bases de Datos Avanzadas\\Proyecto Programado 2\\datos\\limpios\\ArchivoLimpio2.csv', 'r') as file:
+                # Procesa el archivo CSV y crea nodos
+                for line in file.readlines()[:20]: #leemos los primeros 20 registros
+                    datos = line.strip().split(',')  # como los datos se seperan por comas entonces hacemos split
+                    etiqueta = "Categoria Medicamento"  # definimos la etiqueta del nodo
+                    datos_dict = { #cargamos los atributos del nodo mediante un diccionario
+                        'GRUPO' : datos[0], #datos[x] para acceder a cada dato del los registros, recordemos que el registro es una tupla.
+                        'DESCRIPCIÓN': datos[1],
+                    }
+                    # Llama a la función para crear el nodo
+                    session.write_transaction(crear_nodoCategoriaMedicamentos, etiqueta, datos_dict)
