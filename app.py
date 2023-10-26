@@ -17,6 +17,7 @@ def cargar_archivos_csv():
     # Botón para iniciar el procesamiento de nodos
     if st.button("Cargar Nodos"):
         if uploaded_files:
+            """
             # Leer los archivos CSV
             primerArchivo = pd.read_csv(uploaded_files[0], low_memory=False)
             segundoArchivo = pd.read_csv(uploaded_files[1], low_memory=False)
@@ -61,18 +62,18 @@ def cargar_archivos_csv():
             nombre_archivo_limpio5 = r'C:\\Users\\Luis Antonio Jimenez\OneDrive - Estudiantes ITCR\\TEC\\ATI\\Semestre 6\\Bases de Datos Avanzadas\Proyecto Programado 2\\datos\\limpios\\ArchivoLimpio5.csv'
             nuevoArchivo5.to_csv(nombre_archivo_limpio5, index=False)
             print("Normalizacion de archivo 5")
-            
+            """
             #Creamos los archivos que necesitamos para los nodos
-            CrearArchivosParaNodos.crearArchivoMedicamentos()
-            print("Archivo para el nodo medicamentos creado con éxito")
-            CrearArchivosParaNodos.crearArchivoPrincipiosActivos()
-            print("Archivo para el nodo principios activos creado con éxito")
-            CrearArchivosParaNodos.crearArchivosLaboratorioOferente()
-            print("Archivo para el nodo laboratorio oferente creado con éxito")
-            CrearArchivosParaNodos.crearArchivoFabricantes()
-            print("Archivo para el nodo fabricantes creado con éxito")
-            CrearArchivosParaNodos.crearArchivoDepartamento()
-            print("Archivo para el nodo departamento creado con éxito")
+            #CrearArchivosParaNodos.crearArchivoMedicamentos()
+            #print("Archivo para el nodo medicamentos creado con éxito")
+            #CrearArchivosParaNodos.crearArchivoPrincipiosActivos()
+            #print("Archivo para el nodo principios activos creado con éxito")
+            #CrearArchivosParaNodos.crearArchivosLaboratorioOferente()
+            #print("Archivo para el nodo laboratorio oferente creado con éxito")
+            #CrearArchivosParaNodos.crearArchivoFabricantes()
+            #print("Archivo para el nodo fabricantes creado con éxito")
+            #CrearArchivosParaNodos.crearArchivoDepartamento()
+            #print("Archivo para el nodo departamento creado con éxito")
 
             # Llama a la función para validar la conexión
             if db.validarConexionNeo4j():
@@ -88,9 +89,12 @@ def cargar_archivos_csv():
             #Creamos los nodos principios activos en neo4j
             db.crearNodoPrincipioActivo()
             print("Nodos Principios Activos creados con éxito")
-            #Creamos los nodos laboratorio oferente en neo4j
+            #Creamos los nodos categoria medicamento en neo4j
             db.crearNodoCategoriaMedicamentos()
             print("Nodos Categoría Medicamentos creados con éxito")
+            #Creamos los nodos laboratorio oferente en neo4j
+            db.crearNodoLaboratorioOferente()
+            print("Nodos Laboratorio Oferente creados con éxito")
             #Creamos los nodos Departamento en neo4j
             db.crearNodoDepartamento()
             print("Nodos Departamento creados con éxito")

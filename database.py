@@ -13,6 +13,7 @@ def crear_nodo(tx, etiqueta, datos):
         f"Nombre_del_producto_farmacéutico: '{datos['Nombre del producto farmacéutico']}', "
         f"Tipo_de_fármaco: '{datos['Tipo de fármaco']}', "
         f"Estado: '{datos['Estado']}', "
+        f"Principio_activo_o_asociación_de_principios_activos: '{datos['Principio activo o asociación de principios activos']}',"
         f"Precio_venta_con_IVA_Euros: '{datos['Precio venta con IVA_Euros']}', "
         f"Tratamiento_de_larga_duración: '{datos['Tratamiento de larga duración']}', "
         f"Medicamento_huérfano: '{datos['Medicamento huérfano']}', "
@@ -41,14 +42,15 @@ def crearNodoMedicamento():
                         'Nombre del producto farmacéutico' : datos[0], #datos[x] para acceder a cada dato del los registros, recordemos que el registro es una tupla.
                         'Tipo de fármaco': datos[1],
                         'Estado': datos[2],
-                        'Precio venta con IVA_Euros': datos[3],
-                        'Tratamiento de larga duración': datos[4],
-                        'Medicamento huérfano': datos[5],
-                        'Código de Medicamento': datos[6],
-                        'Nombre Genérico': datos[7],
-                        'Presentación': datos[8],
-                        'Precio máximo de venta transacción final comercial': datos[9],
-                        'PRECIO UNITARIO': datos[10]
+                        'Principio activo o asociación de principios activos': datos[3],
+                        'Precio venta con IVA_Euros': datos[4],
+                        'Tratamiento de larga duración': datos[5],
+                        'Medicamento huérfano': datos[6],
+                        'Código de Medicamento': datos[7],
+                        'Nombre Genérico': datos[8],
+                        'Presentación': datos[9],
+                        'Precio máximo de venta transacción final comercial': datos[10],
+                        'PRECIO UNITARIO': datos[11]
                     }
                     # Llama a la función para crear el nodo
                     session.write_transaction(crear_nodo, etiqueta, datos_dict)
@@ -105,7 +107,8 @@ def crearNodoPrincipioActivo():
 def crear_nodoLaboratorioOferente(tx, etiqueta, datos):
     query = (
         f"CREATE (n:`{etiqueta}` {{"
-        f"Nombre: '{datos['Nombre del laboratorio ofertante']}'"
+        f"`Nombre`: '{datos['Nombre del laboratorio ofertante']}', "
+        f"`Principio activo o asociación de principios activos`: '{datos['Principio activo o asociación de principios activos']}'"
         "})"
     )
     tx.run(query)
@@ -121,8 +124,10 @@ def crearNodoLaboratorioOferente():
                 # Procesa el archivo CSV y crea nodos
                 for line in file.readlines()[:20]: #leemos los primeros 20 registros
                     etiqueta = "LaboratorioOferente"  # definimos la etiqueta del nodo
+                    datos = line.strip().split(',')
                     datos_dict = { #cargamos los atributos del nodo mediante un diccionario
-                        'Nombre del laboratorio ofertante' : line #datos[x] para acceder a cada dato del los registros, recordemos que el registro es una tupla.
+                        'Nombre del laboratorio ofertante' : datos[0], #datos[x] para acceder a cada dato del los registros, recordemos que el registro es una tupla.
+                        'Principio activo o asociación de principios activos': datos[1]
                     }
                     # Llama a la función para crear el nodo
                     session.write_transaction(crear_nodoLaboratorioOferente, etiqueta, datos_dict)
@@ -131,7 +136,8 @@ def crearNodoLaboratorioOferente():
 def crear_nodoDepartamento(tx, etiqueta, datos):
     query = (
         f"CREATE (n:`{etiqueta}` {{"
-        f"Nombre: '{datos['SERVICIO']}'"
+        f"Nombre: '{datos['SERVICIO']}', "
+        f"Descripción: '{datos['DESCRIPCION']}'"
         "})"
     )
     tx.run(query)
@@ -147,8 +153,10 @@ def crearNodoDepartamento():
                 # Procesa el archivo CSV y crea nodos
                 for line in file.readlines()[:20]: #leemos los primeros 20 registros
                     etiqueta = "Departamento"  # definimos la etiqueta del nodo
+                    datos = line.strip().split(',')
                     datos_dict = { #cargamos los atributos del nodo mediante un diccionario
-                        'SERVICIO' : line #datos[x] para acceder a cada dato del los registros, recordemos que el registro es una tupla.
+                        'SERVICIO' : datos[0], #datos[x] para acceder a cada dato del los registros, recordemos que el registro es una tupla.
+                        'DESCRIPCION' : datos[1]
                     }
                     # Llama a la función para crear el nodo
                     session.write_transaction(crear_nodoDepartamento, etiqueta, datos_dict)
@@ -157,7 +165,8 @@ def crearNodoDepartamento():
 def crear_nodoFabricante(tx, etiqueta, datos):
     query = (
         f"CREATE (n:`{etiqueta}` {{"
-        f"Nombre: '{datos['Fabricante']}'"
+        f"`Nombre`: '{datos['Fabricante']}', "
+        f"`Descripción Principio Activo`: '{datos['Descripción Principio Activo']}'"
         "})"
     )
     tx.run(query)
@@ -173,8 +182,10 @@ def crearNodoFabricante():
                 # Procesa el archivo CSV y crea nodos
                 for line in file.readlines()[:20]: #leemos los primeros 20 registros
                     etiqueta = "Fabricante"  # definimos la etiqueta del nodo
+                    datos = line.strip().split(',')
                     datos_dict = { #cargamos los atributos del nodo mediante un diccionario
-                        'Fabricante' : line #datos[x] para acceder a cada dato del los registros, recordemos que el registro es una tupla.
+                        'Fabricante' : datos[0], #datos[x] para acceder a cada dato del los registros, recordemos que el registro es una tupla.
+                        'Descripción Principio Activo': datos[1]
                     }
                     # Llama a la función para crear el nodo
                     session.write_transaction(crear_nodoFabricante, etiqueta, datos_dict)
