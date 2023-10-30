@@ -16,6 +16,7 @@ def cargar_archivos_csv():
 
     # Botón para iniciar el procesamiento de nodos
     if st.button("Cargar Nodos"):
+        uploaded_files = True
         if uploaded_files:
             """
             # Leer los archivos CSV
@@ -76,13 +77,14 @@ def cargar_archivos_csv():
             #print("Archivo para el nodo departamento creado con éxito")
 
             # Llama a la función para validar la conexión
-            if db.validarConexionNeo4j():
+            #if db.validarConexionNeo4j():
                 # Realiza otras operaciones si la conexión es exitosa
-                print("La conexión es válida, puedes realizar otras operaciones en Neo4j.")
-            else:
+                #print("La conexión es válida, puedes realizar otras operaciones en Neo4j.")
+            #else:
                 # Maneja el caso en el que la conexión no sea válida
-                print("No se pudo validar la conexión a Neo4j.")
+                #print("No se pudo validar la conexión a Neo4j.")
 
+            """
             #Creamos los nodos medicamentos en neo4j
             db.crearNodoMedicamento()
             print("Nodos Medicamentos creados con éxito")
@@ -101,7 +103,14 @@ def cargar_archivos_csv():
             #Creamos los nodos Fabricante en neo4j
             db.crearNodoFabricante()
             print("Nodos Fabricante creados con éxito")
-
+            print("Nodos creados con éxito")
+            """
+            #Creamos las relaciones entre los nodos
+            db.crearRelacionMedicamentoDepartamento()
+            db.crearRelacionLaboratorioFabricante()
+            db.crearRelacionMedicamentoLaboratorio()
+            db.crearRelacionMedicamentoPrincipioActivo()
+            db.crearRelacionMedicamentoCategoriaMedicamento()
         else:
             st.warning("Por favor, suba los archivos CSV primero.")  # Mensaje de advertencia si no se cargaron archivos
 
