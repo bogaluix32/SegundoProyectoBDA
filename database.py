@@ -455,10 +455,6 @@ WHERE x.Principio_activo_o_asociacion_de_principios_activos = $PARAMETRO
 RETURN x.Nombre_del_laboratorio_ofertante as Fabricante, 
 x.Precio_venta_con_IVA_Euros as PrecioConIVA, x.Precio_maximo_de_venta_transaccion_final_comercial as precioMaximo
 
-
-MATCH (x:Fabricante)
-WHERE x.Nombre = 'OMEPRAZOL'
-RETURN x
 """
 #Consulta 4
 def auxiliarObtenerTop5MedicamentosMasUsadosPorDepartamento():
@@ -484,6 +480,17 @@ def auxiliarObtenerTop5MedicamentosMasUsadosPorDepartamento():
     
     return resultados
 
+def obtenerDetalleTop5MedicamentosMasUsadosPorDepartamento(principioActivo):
+    with GraphDatabase.driver(URI, auth=AUTH) as driver:
+        with driver.session() as session:
+            result = session.run("""
+                MATCH (x:Medicamento)
+                WHERE x.Principio_activo_o_asociacion_de_principios_activos = $principioActivo
+                RETURN x.Nombre_del_laboratorio_ofertante as Fabricante, 
+                x.Precio_venta_con_IVA_Euros as PrecioConIVA, x.Precio_maximo_de_venta_transaccion_final_comercial as precioMaximo
+            """, principioActivo=principioActivo)
+            
+            return [record.data() for record in result]
             
 """
 Consulta 8:
@@ -494,6 +501,27 @@ RETURN principioActivo, numFabricantes
 ORDER BY numFabricantes DESC
 LIMIT 10
 """
+
+#Consulta 8
+def top10PrincipiosActivosProducidosPorMasFabricantes():
+    with GraphDatabase.driver(URI, auth=AUTH) as driver:
+        with driver.session() as session:
+            result = session.run("""
+                MATCH (x:Medicamento), (y:LaboratorioOferente)
+                WHERE x.Principio_activo_o_asociacion_de_principios_activos = y.Principio_activo_o_asociacion_de_principios_activos
+                WITH x.Principio_activo_o_asociacion_de_principios_activos AS principioActivo, COUNT(DISTINCT y) AS numFabricantes
+                RETURN principioActivo, numFabricantes
+                ORDER BY numFabricantes DESC
+                LIMIT 10
+            """)
+
+            resultados = []
+            for record in result:
+                principioActivo = record["principioActivo"]
+                numFabricantes = record["numFabricantes"]
+                resultados.append((principioActivo, numFabricantes))
+            
+            return resultados
 
 #Consulta 6 y 9 la tiene agus
 #Consulta 7 falta

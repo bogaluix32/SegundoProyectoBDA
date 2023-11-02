@@ -131,7 +131,7 @@ def cargar_archivos_csv():
                 print("Laboratorio:", resultado["Laboratorio"])
                 print("Presentación:", resultado["Presentación"])
                 print("Categorías:", resultado["Categorias"])
-            
+            """
             print("--- Consulta 1 ---")
             x = "ANTIBIOTICOS"
             codigo = db.axuliar_BuscarCategoria(x)
@@ -144,7 +144,7 @@ def cargar_archivos_csv():
                 print("Principio Activo:", i["principio"])
                 print("Fabricante:", i["laboratorio"])
                 print("Es de Marca:", i["marcaOGenerico"])
-
+            """
             print("--- Consulta 2 ---")
             x = "INSPRA"
             principio = db.axuliarObtenerPrincipioActivoUsandoNombreProducto(x)
@@ -156,16 +156,33 @@ def cargar_archivos_csv():
             print("--- Consulta 4 ---")
             resultados = db.auxiliarObtenerTop5MedicamentosMasUsadosPorDepartamento()
             # Ahora puedes trabajar con los resultados
+            print("---TOP 5---")
             for resultado in resultados:
                 medicamento = resultado["medicamento"]
                 departamento = resultado["departamento"]
                 cantidad_solicitudes = resultado["cantidad_solicitudes"]
 
+                nombre_medicamento = medicamento["Nombre_del_producto_farmacéutico"]
+                nombre_departamento = departamento["Nombre"]
+
+                print(f"Medicamento: {nombre_medicamento}, Departamento: {nombre_departamento}, Solicitudes: {cantidad_solicitudes}")
+
                 principio_activo = medicamento["Principio_activo_o_asociacion_de_principios_activos"]
 
+                detalles_medicamentos = db.obtenerDetalleTop5MedicamentosMasUsadosPorDepartamento(principio_activo)
 
-                print(f"Medicamento: {medicamento}, Departamento: {departamento}, Solicitudes: {cantidad_solicitudes}")
-                print(f"Principio Activo: {principio_activo}")
+                print("---Detalles---")
+                for detalle in detalles_medicamentos:
+                    print(f"Fabricante: {detalle['Fabricante']}")
+                    print(f"Precio con IVA: {detalle['PrecioConIVA']}")
+                    print(f"Precio Máximo: {detalle['precioMaximo']}")
+            
+            print("--- Consulta 8 ---")
+            resultados = db.top10PrincipiosActivosProducidosPorMasFabricantes()
+            print("---TOP 10---")
+            for resultado in resultados:
+                principioActivo, numFabricantes = resultado
+                print(f"Principio Activo: {principioActivo}, Número de Fabricantes: {numFabricantes}")
 
         else:
             st.warning("Por favor, suba los archivos CSV primero.")  # Mensaje de advertencia si no se cargaron archivos
@@ -184,6 +201,145 @@ def main():
         # Si el usuario elige "Subir Datos," mostrar esta sección
         st.subheader("Sección para Subir Datos")
         cargar_archivos_csv()
+    elif choice == "Consultas":
+        # Si el usuario elige "Consultas," mostrar ComboBox y cuadro de texto
+        st.subheader("Consultas")
+        consulta_elegida = st.selectbox("Selecciona una consulta", ["Consulta 1", "Consulta 2", "Consulta 3", "Consulta 4", "Consulta 5", "Consulta 6", "Consulta 7", "Consulta 8", "Consulta 9"])
 
+        #//////////////////////////////////////////////////////////////////// C O N S U L T A S //////////////////////////////////////////
+    
+    
+    
+    #///////////////////////////////////Consulta 1////////////////////////////////////////////////////////////////////////////////////////
+              
+        # Realizar acciones basadas en la consulta seleccionada
+        if consulta_elegida:
+                if consulta_elegida == "Consulta 1":
+                    st.subheader("Consulta 1 - Reporte de medicamentos que potencialmente podría adquirir la CCSS")
+                        # Agregar una entrada de texto 
+                    categoria = st.text_input("Ingresa la categoria del medicamento:")   
+                    codigo = db.axuliar_BuscarCategoria(categoria)
+                    principioActivo = db.axuliar_BuscarMedicamentoUsandoCodigo(codigo)
+                    detalleMedicamento = db.reporteMedicamentosPotencialmenteAdquiridos(principioActivo)
+                        
+                    if detalleMedicamento:
+                        st.text("Medicamentos potencialmente adquiridos por la caja:")
+                        for i in detalleMedicamento:
+                            for i in detalleMedicamento:
+                                st.write("Nombre Medicamento:", i["nombre"])
+                                st.write("Principio Activo:", i["principio"])
+                                st.write("Fabricante:", i["laboratorio"])
+                                st.write("Es de Marca:", i["marcaOGenerico"])
+                    else:
+                        st.text("No se encontraron medicamentos potencialmente adquiridos por la caja.")
 
+    #///////////////////////////////////Consulta 2////////////////////////////////////////////////////////////////////////////////////////
+    
+                elif consulta_elegida == "Consulta 2":
+                    st.subheader("Consulta 2 - Posibles proveedores de medicamentos")
+                        # Agregar una entrada de 
+                    nombre_medicamento = st.text_input("Ingresa el nombre del medicamento:")
+                    
+                    #if nombre_medicamento:
+                    # Llamar a la función para buscar buscar lo solicitado
+                    # proveedores_encontrados = buscar_proveedor(nombre_medicamento)
+                    
+                   # if proveedores_encontrados:
+                   #     st.text("Proveedores encontrados:")
+                   #     for proveedor in proveedores_encontrados:
+                   #         st.text(proveedor)
+                   #     else:
+                   #      st.text("No se encontraron proveedores para el medicamento ingresado.")
+ 
+     #///////////////////////////////////Consulta 3////////////////////////////////////////////////////////////////////////////////////////
+              
+                elif consulta_elegida == "Consulta 3":
+                    st.subheader("Consulta 3 - Medicamentos Bioequivalentes")
+                        # Agregar una entrada de texto 
+                    principio_activo = st.text_input("Ingresa el principio activo:")
+                    
+                    #if principio_activo:
+                    # Llamar a la función para buscar buscar lo solicitado
+                    # medicamentos_encontrados = buscar_medicamentos_por_principio_activo(principio_activo)
+                    
+                    #if medicamentos_encontrados:
+                    #    st.text("Medicamentos bioequivalentes encontrados:")
+                    #    for medicamento in medicamentos_encontrados:
+                    #        st.text(medicamento)
+                    #    else:
+                    #     st.text("No se encontraron medicamentos para el principio activo ingresado.")
+        #///////////////////////////////////Consulta 4////////////////////////////////////////////////////////////////////////////////////////
+                
+                elif consulta_elegida == "Consulta 4":
+                    st.subheader("Consulta 4 - Top 5 de medicamentos o suministros solicitados por cada departamento del hospital")
+                        # Agregar una entrada de texto 
+                    departamento = st.text_input("Ingresa el departamento:")
+                    
+                    #if departamento:
+                    # Llamar a la función para buscar buscar lo solicitado
+                    # Top5_medicamentos = buscar_Top5_medicamentos_por_departamento(departamento)
+                    
+                    #if Top5_medicamentos:
+                    #    st.text("Top 5 de los Medicamentos solicitados por la caja:")
+                    #    for medicamento in Top5_medicamentos:
+                    #        st.text(medicamento)
+                    #    else:
+                    #     st.text("No se encontraron medicamentos.")
+
+        #///////////////////////////////////Consulta 5////////////////////////////////////////////////////////////////////////////////////////
+                elif consulta_elegida == "Consulta 5":
+                    st.subheader("Consulta 5 -  Fabricantes y ofertantes que trabajan con el producto, así como la presentación de los productos ofrecidos para ese principio activo y las categorías a las que pertenece según el catálogo de la CCSS")
+                        # Agregar una entrada de texto 
+                    principio_activo_consulta5 = st.text_input("Ingresa el principio activo:")
+                    
+                    #if principio_activo_consulta5:
+                    # Llamar a la función para buscar lo solicitado
+                    # Ofertantes_y_fabricantes = buscar_fabricantes_ofertantes(principio_activo_consulta5)
+                    
+                    #if Ofertantes_y_fabricantes:
+                    #    st.text("Fabricantes y ofertantes encontrados:")
+                    #    for ofertante_fabricante in Ofertantes_y_fabricantes:
+                    #        st.text(ofertante_fabricante)
+                    #    else:
+                    #     st.text("No se encontro información.")
+
+        #///////////////////////////////////Consulta 6////////////////////////////////////////////////////////////////////////////////////////
+              
+                elif consulta_elegida == "Consulta 6":
+                    st.subheader("Consulta 6 - Top 10 de principios activos que han sido suspendidos para uso comercial")
+                   #LLAMAR A LA FUNCION Top10_principiosActivos
+                   # st.text(Top10_principiosActivos)   
+
+         #///////////////////////////////////Consulta 7////////////////////////////////////////////////////////////////////////////////////////
+              
+                elif consulta_elegida == "Consulta 7":
+                    st.subheader("Consulta 7 - Lista de los medicamentos para tratamientos de larga duración que se encuentren disponibles en la CCSS y los posibles reemplazos para él")
+                   #LLAMAR A LA FUNCION tratamientos_larga_duracion
+                   # st.text(tratamientos_larga_duracion)
+
+        #///////////////////////////////////Consulta 8////////////////////////////////////////////////////////////////////////////////////////
+              
+                elif consulta_elegida == "Consulta 8":
+                    st.subheader("Consulta 8 - Top 10 de principios activos que son producidos por más fabricantes")
+                   #LLAMAR A LA FUNCION Top10_principiosActivos_producidos_por_fabricantes                   
+                    #st.text(Top10_principiosActivos_producidos_por_fabricantes)   
+
+        #///////////////////////////////////Consulta 9////////////////////////////////////////////////////////////////////////////////////////
+               
+                elif consulta_elegida == "Consulta 9":
+                    st.subheader("Consulta 9 -  Productos de un fabricante que actualmente no están en la CCSS.")
+                        # Agregar una entrada de texto 
+                    fabricante = st.text_input("Ingresa el nombre del fabricante:")
+                    
+                    #if fabricante:
+                    # Llamar a la función para buscar lo solicitado
+                    # productos_no_enCCSS = buscar_proctos_NO_enCCSS_por_fabriacante(fabricante)
+                    
+                    #if productos_no_enCCSS:
+                    #    st.text("Productos encontrados:")
+                    #    for productos in productos_no_enCCSS:
+                    #        st.text(productos)
+                    #    else:
+                    #     st.text("No se encontraron productos.")
+                    
 main()  # Llamar a la función main() para iniciar la aplicación
