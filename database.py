@@ -255,9 +255,10 @@ def crearRelacionLaboratorioFabricante():
             # Crea una sesión de Neo4j
             with driver.session() as session:
                 session.write_transaction(lambda tx: tx.run("""
-                    MATCH (l:LaboratorioOferente), (f:Fabricante)
-                    WHERE l.Principio_activo_o_asociacion_de_principios_activos = f.Descripcion_Principio_Activo
-                    CREATE (l)-[:ABASTECIDO_POR]->(f)
+                    MATCH (m:Medicamento), (f:Fabricante)
+                    WHERE m.Principio_activo_o_asociacion_de_principios_activos = f.Descripcion_Principio_Activo
+                    CREATE (m)-[:ABASTECIDO_POR]->(f)
+                                            
                 """))
 
         print("Relaciones creadas con éxito.")
@@ -315,3 +316,184 @@ def crearRelacionMedicamentoCategoriaMedicamento():
 
     except Exception as e:
         print(f"Error: {str(e)}")
+
+#Consulta 3
+# Función para buscar medicamentos por principio activo
+def buscar_medicamentos_por_principio_activo(principio_activo):
+
+    # Realiza la consulta en una transacción
+    with GraphDatabase.driver(URI, auth=AUTH) as driver:
+        with driver.session() as session:
+            result = session.run(
+                "MATCH (m:Medicamento) "
+                "WHERE m.Principio_activo_o_asociacion_de_principios_activos = $principio_activo "
+                "RETURN m.Nombre_del_producto_farmacéutico",
+                principio_activo=principio_activo
+            )
+
+            # Recopila los nombres de los medicamentos en una lista
+            medicamentos = [record["m.Nombre_del_producto_farmacéutico"] for record in result]
+
+            return medicamentos
+
+#Consulta 5
+def consultar_info_principio_activo(principio_activo):
+    # Configura la conexión a la base de datos de Neo4j
+
+    # Inicia la conexión a la base de datos
+    with GraphDatabase.driver(URI, auth=AUTH) as driver:
+        with driver.session() as session:
+            result = session.run("""
+                MATCH (m:Medicamento)-[:SOLICITADO_POR]->(d:Departamento)
+                MATCH (m:Medicamento)-[:PERTENECE_A]->(c:`Categoria Medicamento`)
+                WHERE m.Principio_activo_o_asociacion_de_principios_activos = $principio_activo
+                RETURN DISTINCT m.Nombre_del_laboratorio_ofertante AS Laboratorio,
+                m.Presentacion AS Presentación, COLLECT(DISTINCT c.DESCRIPCIÓN) AS Categorias""",
+                principio_activo=principio_activo
+            )
+
+            # Procesa y devuelve los resultados
+            resultados = [dict(record) for record in result]
+            return resultados
+
+#Consulta 1
+def axuliar_BuscarCategoria(categoriaMedicamento):
+
+    # Realiza la consulta en una transacción
+    with GraphDatabase.driver(URI, auth=AUTH) as driver:
+        with driver.session() as session:
+            result = session.run("""
+                match(x:`Categoria Medicamento`) where x.`DESCRIPCIÓN` = $categoriaMedicamento return x.GRUPO AS grupo""",
+                categoriaMedicamento=categoriaMedicamento
+            )
+
+            record = result.single()
+            
+            if record:
+                 codigoMedicamento = record["grupo"] 
+            else:
+                codigoMedicamento = None
+            
+            return codigoMedicamento
+
+def axuliar_BuscarMedicamentoUsandoCodigo(codigoMedicamento):
+
+    # Realiza la consulta en una transacción
+    with GraphDatabase.driver(URI, auth=AUTH) as driver:
+        with driver.session() as session:
+            result = session.run("""
+                match(x:Medicamento) where x.Codigo_de_Medicamento = $codigoMedicamento return x.Principio_activo_o_asociacion_de_principios_activos as principioActivo""",
+                codigoMedicamento=codigoMedicamento
+            )
+
+            record = result.single()
+            
+            if record:
+                 principioActivo = record["principioActivo"] 
+            else:
+                principioActivo = None
+            
+            return principioActivo
+        
+def reporteMedicamentosPotencialmenteAdquiridos(principioActivo):
+    # Realiza la consulta en una transacción
+    with GraphDatabase.driver(URI, auth=AUTH) as driver:
+        with driver.session() as session:
+            result = session.run("""
+                match(x:Medicamento) where x.Principio_activo_o_asociacion_de_principios_activos = $principioActivo 
+                                 and x.Codigo_de_Medicamento = '2' return x.Nombre_del_producto_farmacéutico as nombre, 
+                                 x.Principio_activo_o_asociacion_de_principios_activos as principio, 
+                                 x.Nombre_del_laboratorio_ofertante as laboratorio, 
+                                 x.Medicamento_huerfano as marcaOGenerico
+                """,
+                principioActivo=principioActivo
+            )
+
+            # Procesa y devuelve los resultados
+            resultados = [dict(record) for record in result]
+            return resultados
+
+#Consulta 2
+def axuliarObtenerPrincipioActivoUsandoNombreProducto(nombreProducto):
+    # Realiza la consulta en una transacción
+    with GraphDatabase.driver(URI, auth=AUTH) as driver:
+        with driver.session() as session:
+            result = session.run("""
+                match(x:Medicamento) where x.Nombre_del_producto_farmacéutico = $nombreProducto return x.Principio_activo_o_asociacion_de_principios_activos as principioActivo""",
+                nombreProducto=nombreProducto
+            )
+
+            record = result.single()
+            
+            if record:
+                 principioActivo = record["principioActivo"] 
+            else:
+                principioActivo = None
+            
+            return principioActivo
+
+def obtenerProveedoresParaMedicamento(principioActivo):
+    # Realiza la consulta en una transacción
+    with GraphDatabase.driver(URI, auth=AUTH) as driver:
+        with driver.session() as session:
+            result = session.run(
+                "match(x:LaboratorioOferente) where x.Principio_activo_o_asociacion_de_principios_activos = $principioActivo return x.Nombre as Fabricante",
+                principioActivo=principioActivo
+            )
+
+            # Recopila los nombres de los fabricantes en una lista
+            proveedores = [record["Fabricante"] for record in result]
+
+            return proveedores
+"""
+Cosulta 4
+Parte 1:
+
+Parte 2:
+MATCH (x:Medicamento)
+WHERE x.Principio_activo_o_asociacion_de_principios_activos = $PARAMETRO
+RETURN x.Nombre_del_laboratorio_ofertante as Fabricante, 
+x.Precio_venta_con_IVA_Euros as PrecioConIVA, x.Precio_maximo_de_venta_transaccion_final_comercial as precioMaximo
+
+
+MATCH (x:Fabricante)
+WHERE x.Nombre = 'OMEPRAZOL'
+RETURN x
+"""
+#Consulta 4
+def auxiliarObtenerTop5MedicamentosMasUsadosPorDepartamento():
+    resultados = []
+    with GraphDatabase.driver(URI, auth=AUTH) as driver:
+        with driver.session() as session:
+            result = session.run("""
+                MATCH (m:Medicamento)-[r:SOLICITADO_POR]->(d:Departamento)
+                WITH m, d, COUNT(r) AS cantidadSolicitudes
+                RETURN m, d, cantidadSolicitudes
+                ORDER BY cantidadSolicitudes DESC
+                LIMIT 5""",
+            )
+
+            for record in result:
+                # Para cada registro, crea un diccionario con las propiedades m, d, y cantidadSolicitudes
+                resultado_dict = {
+                    "medicamento": record["m"],
+                    "departamento": record["d"],
+                    "cantidad_solicitudes": record["cantidadSolicitudes"]
+                }
+                resultados.append(resultado_dict)  # Agrega el diccionario a la lista
+    
+    return resultados
+
+            
+"""
+Consulta 8:
+MATCH (x:Medicamento), (y:LaboratorioOferente)
+WHERE x.Principio_activo_o_asociacion_de_principios_activos = y.Principio_activo_o_asociacion_de_principios_activos
+WITH x.Principio_activo_o_asociacion_de_principios_activos AS principioActivo, COUNT(DISTINCT y) AS numFabricantes
+RETURN principioActivo, numFabricantes
+ORDER BY numFabricantes DESC
+LIMIT 10
+"""
+
+#Consulta 6 y 9 la tiene agus
+#Consulta 7 falta

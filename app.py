@@ -106,11 +106,67 @@ def cargar_archivos_csv():
             print("Nodos creados con éxito")
             """
             #Creamos las relaciones entre los nodos
-            db.crearRelacionMedicamentoDepartamento()
-            db.crearRelacionLaboratorioFabricante()
-            db.crearRelacionMedicamentoLaboratorio()
-            db.crearRelacionMedicamentoPrincipioActivo()
-            db.crearRelacionMedicamentoCategoriaMedicamento()
+            #db.crearRelacionMedicamentoDepartamento()
+            #db.crearRelacionLaboratorioFabricante()
+            #db.crearRelacionMedicamentoLaboratorio()
+            #db.crearRelacionMedicamentoPrincipioActivo()
+            #db.crearRelacionMedicamentoCategoriaMedicamento()
+
+            # Ejemplo de uso Consulta 3
+            print("--- Consulta 3 ---")
+            p = "CLARITROMICINA"
+            medicamentos = db.buscar_medicamentos_por_principio_activo(p)
+
+            # Imprime los medicamentos encontrados
+            for medicamento in medicamentos:
+                print(medicamento)
+            
+            # Ejemplo de uso Consulta 5
+            print("--- Consulta 5 ---")
+            x = "ACICLOVIR"
+            resultados = db.consultar_info_principio_activo(x)
+
+            # Imprime los resultados
+            for resultado in resultados:
+                print("Laboratorio:", resultado["Laboratorio"])
+                print("Presentación:", resultado["Presentación"])
+                print("Categorías:", resultado["Categorias"])
+            
+            print("--- Consulta 1 ---")
+            x = "ANTIBIOTICOS"
+            codigo = db.axuliar_BuscarCategoria(x)
+            print(codigo)
+            principioActivo = db.axuliar_BuscarMedicamentoUsandoCodigo(codigo)
+            print(principioActivo)
+            detalleMedicamento = db.reporteMedicamentosPotencialmenteAdquiridos(principioActivo)
+            for i in detalleMedicamento:
+                print("Nombre Medicamento:", i["nombre"])
+                print("Principio Activo:", i["principio"])
+                print("Fabricante:", i["laboratorio"])
+                print("Es de Marca:", i["marcaOGenerico"])
+
+            print("--- Consulta 2 ---")
+            x = "INSPRA"
+            principio = db.axuliarObtenerPrincipioActivoUsandoNombreProducto(x)
+            print(principio)
+            proveedores = db.obtenerProveedoresParaMedicamento(principio)
+            for proveedor in proveedores:
+                print(proveedor)
+            
+            print("--- Consulta 4 ---")
+            resultados = db.auxiliarObtenerTop5MedicamentosMasUsadosPorDepartamento()
+            # Ahora puedes trabajar con los resultados
+            for resultado in resultados:
+                medicamento = resultado["medicamento"]
+                departamento = resultado["departamento"]
+                cantidad_solicitudes = resultado["cantidad_solicitudes"]
+
+                principio_activo = medicamento["Principio_activo_o_asociacion_de_principios_activos"]
+
+
+                print(f"Medicamento: {medicamento}, Departamento: {departamento}, Solicitudes: {cantidad_solicitudes}")
+                print(f"Principio Activo: {principio_activo}")
+
         else:
             st.warning("Por favor, suba los archivos CSV primero.")  # Mensaje de advertencia si no se cargaron archivos
 
