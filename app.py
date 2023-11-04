@@ -113,6 +113,7 @@ def cargar_archivos_csv():
             #db.crearRelacionMedicamentoCategoriaMedicamento()
 
             # Ejemplo de uso Consulta 3
+            """
             print("--- Consulta 3 ---")
             p = "CLARITROMICINA"
             medicamentos = db.buscar_medicamentos_por_principio_activo(p)
@@ -120,8 +121,9 @@ def cargar_archivos_csv():
             # Imprime los medicamentos encontrados
             for medicamento in medicamentos:
                 print(medicamento)
-            
+            """
             # Ejemplo de uso Consulta 5
+            """
             print("--- Consulta 5 ---")
             x = "ACICLOVIR"
             resultados = db.consultar_info_principio_activo(x)
@@ -131,6 +133,7 @@ def cargar_archivos_csv():
                 print("Laboratorio:", resultado["Laboratorio"])
                 print("Presentación:", resultado["Presentación"])
                 print("Categorías:", resultado["Categorias"])
+            """    
             """
             print("--- Consulta 1 ---")
             x = "ANTIBIOTICOS"
@@ -145,6 +148,7 @@ def cargar_archivos_csv():
                 print("Fabricante:", i["laboratorio"])
                 print("Es de Marca:", i["marcaOGenerico"])
             """
+            """
             print("--- Consulta 2 ---")
             x = "INSPRA"
             principio = db.axuliarObtenerPrincipioActivoUsandoNombreProducto(x)
@@ -152,7 +156,8 @@ def cargar_archivos_csv():
             proveedores = db.obtenerProveedoresParaMedicamento(principio)
             for proveedor in proveedores:
                 print(proveedor)
-            
+            """
+            """
             print("--- Consulta 4 ---")
             resultados = db.auxiliarObtenerTop5MedicamentosMasUsadosPorDepartamento()
             # Ahora puedes trabajar con los resultados
@@ -176,16 +181,21 @@ def cargar_archivos_csv():
                     print(f"Fabricante: {detalle['Fabricante']}")
                     print(f"Precio con IVA: {detalle['PrecioConIVA']}")
                     print(f"Precio Máximo: {detalle['precioMaximo']}")
-            
+            """
+            """
             print("--- Consulta 8 ---")
             resultados = db.top10PrincipiosActivosProducidosPorMasFabricantes()
             print("---TOP 10---")
             for resultado in resultados:
                 principioActivo, numFabricantes = resultado
                 print(f"Principio Activo: {principioActivo}, Número de Fabricantes: {numFabricantes}")
+            """
 
         else:
             st.warning("Por favor, suba los archivos CSV primero.")  # Mensaje de advertencia si no se cargaron archivos
+    elif st.button("Limpiar Base de Datos"):
+        db.clean_database()
+        st.success("Base de datos limpiada con éxito.")
 
 # Función principal de la aplicación
 def main():
@@ -193,7 +203,7 @@ def main():
     st.title("Proyecto 2 Bases de datos Avanzadas")
     
     # Crear el menú principal con dos opciones: "Subir Datos" y "Consultas"
-    menu = ["Subir Datos", "Consultas"]
+    menu = ["Subir Datos", "Consultas", "CRUD Medicamento", "CRUD Laboratorio", "CRUD Fabricante", "CRUD Principio Activo", "CRUD Departamento", "CRUD Categoria Medicamento"]
     choice = st.sidebar.selectbox("Menú", menu)  # Permite al usuario seleccionar una opción del menú en el sidebar
 
     # Lógica condicional basada en la opción seleccionada
@@ -239,77 +249,83 @@ def main():
                     st.subheader("Consulta 2 - Posibles proveedores de medicamentos")
                         # Agregar una entrada de 
                     nombre_medicamento = st.text_input("Ingresa el nombre del medicamento:")
-                    
-                    #if nombre_medicamento:
-                    # Llamar a la función para buscar buscar lo solicitado
-                    # proveedores_encontrados = buscar_proveedor(nombre_medicamento)
-                    
-                   # if proveedores_encontrados:
-                   #     st.text("Proveedores encontrados:")
-                   #     for proveedor in proveedores_encontrados:
-                   #         st.text(proveedor)
-                   #     else:
-                   #      st.text("No se encontraron proveedores para el medicamento ingresado.")
- 
+
+                    principio = db.axuliarObtenerPrincipioActivoUsandoNombreProducto(nombre_medicamento)
+                    proveedores = db.obtenerProveedoresParaMedicamento(principio) 
+                    if proveedores:
+                        st.text("Proveedores:")
+                        for proveedor in proveedores:
+                            st.write(proveedor)
+                    else:
+                        st.text("No se encontraron resultados.")
      #///////////////////////////////////Consulta 3////////////////////////////////////////////////////////////////////////////////////////
               
                 elif consulta_elegida == "Consulta 3":
                     st.subheader("Consulta 3 - Medicamentos Bioequivalentes")
                         # Agregar una entrada de texto 
-                    principio_activo = st.text_input("Ingresa el principio activo:")
+                    principio_activo = st.text_input("Ingresa el principio activo para buscar el medicamento:")
+
+                    medicamentos = db.buscar_medicamentos_por_principio_activo(principio_activo)
+                    if medicamentos:
+                        st.text("Lista de medicamentos bioequivalentes")
+                        for medicamento in medicamentos:
+                            st.write(medicamento)
+                    else:
+                        st.text("No se encontraron resultados.")
                     
-                    #if principio_activo:
-                    # Llamar a la función para buscar buscar lo solicitado
-                    # medicamentos_encontrados = buscar_medicamentos_por_principio_activo(principio_activo)
-                    
-                    #if medicamentos_encontrados:
-                    #    st.text("Medicamentos bioequivalentes encontrados:")
-                    #    for medicamento in medicamentos_encontrados:
-                    #        st.text(medicamento)
-                    #    else:
-                    #     st.text("No se encontraron medicamentos para el principio activo ingresado.")
         #///////////////////////////////////Consulta 4////////////////////////////////////////////////////////////////////////////////////////
                 
                 elif consulta_elegida == "Consulta 4":
                     st.subheader("Consulta 4 - Top 5 de medicamentos o suministros solicitados por cada departamento del hospital")
-                        # Agregar una entrada de texto 
-                    departamento = st.text_input("Ingresa el departamento:")
+                    resultados = db.auxiliarObtenerTop5MedicamentosMasUsadosPorDepartamento()
+                    if resultados:
+                        st.text("TOP 5:")
+                        for resultado in resultados:
+                            medicamento = resultado["medicamento"]
+                            departamento = resultado["departamento"]
+                            cantidad_solicitudes = resultado["cantidad_solicitudes"]
+                            nombre_medicamento = medicamento["Nombre_del_producto_farmacéutico"]
+                            nombre_departamento = departamento["Nombre"]
+
+                            st.write(f"Medicamento: {nombre_medicamento}, Departamento: {nombre_departamento}, Solicitudes: {cantidad_solicitudes}")
+                            
+                            principio_activo = medicamento["Principio_activo_o_asociacion_de_principios_activos"]
+
+                            detalles_medicamentos = db.obtenerDetalleTop5MedicamentosMasUsadosPorDepartamento(principio_activo)
+
+                            if detalles_medicamentos:
+                                st.text(f"Detalles para el medicamento: {nombre_medicamento}")
+                                for detalle in detalles_medicamentos:
+                                    st.write(f"Fabricante: {detalle['Fabricante']}")
+                                    st.write(f"Precio con IVA: {detalle['PrecioConIVA']}")
+                                    st.write(f"Precio Máximo: {detalle['precioMaximo']}")
+                            else:
+                                st.text(f"No se encontraron detalles para el medicamento {nombre_medicamento}")
+                    else:
+                        st.text("No se encontraron resultados.")
                     
-                    #if departamento:
-                    # Llamar a la función para buscar buscar lo solicitado
-                    # Top5_medicamentos = buscar_Top5_medicamentos_por_departamento(departamento)
-                    
-                    #if Top5_medicamentos:
-                    #    st.text("Top 5 de los Medicamentos solicitados por la caja:")
-                    #    for medicamento in Top5_medicamentos:
-                    #        st.text(medicamento)
-                    #    else:
-                    #     st.text("No se encontraron medicamentos.")
 
         #///////////////////////////////////Consulta 5////////////////////////////////////////////////////////////////////////////////////////
                 elif consulta_elegida == "Consulta 5":
                     st.subheader("Consulta 5 -  Fabricantes y ofertantes que trabajan con el producto, así como la presentación de los productos ofrecidos para ese principio activo y las categorías a las que pertenece según el catálogo de la CCSS")
                         # Agregar una entrada de texto 
-                    principio_activo_consulta5 = st.text_input("Ingresa el principio activo:")
+                    pricipioActivo = st.text_input("Ingresa el principio activo:")
+
+                    resultados = db.consultar_info_principio_activo(pricipioActivo)
                     
-                    #if principio_activo_consulta5:
-                    # Llamar a la función para buscar lo solicitado
-                    # Ofertantes_y_fabricantes = buscar_fabricantes_ofertantes(principio_activo_consulta5)
-                    
-                    #if Ofertantes_y_fabricantes:
-                    #    st.text("Fabricantes y ofertantes encontrados:")
-                    #    for ofertante_fabricante in Ofertantes_y_fabricantes:
-                    #        st.text(ofertante_fabricante)
-                    #    else:
-                    #     st.text("No se encontro información.")
+                    if resultados:
+                        for resultado in resultados:
+                            st.text("Laboratorio:", resultado["Laboratorio"])
+                            st.text("Presentación:", resultado["Presentación"])
+                            st.text("Categorías:", resultado["Categorias"])
+                    else:
+                        st.text("No se encontraron resultados.")
 
         #///////////////////////////////////Consulta 6////////////////////////////////////////////////////////////////////////////////////////
               
                 elif consulta_elegida == "Consulta 6":
                     st.subheader("Consulta 6 - Top 10 de principios activos que han sido suspendidos para uso comercial")
                    #LLAMAR A LA FUNCION Top10_principiosActivos
-                   # st.text(Top10_principiosActivos)   
-
          #///////////////////////////////////Consulta 7////////////////////////////////////////////////////////////////////////////////////////
               
                 elif consulta_elegida == "Consulta 7":
@@ -321,8 +337,15 @@ def main():
               
                 elif consulta_elegida == "Consulta 8":
                     st.subheader("Consulta 8 - Top 10 de principios activos que son producidos por más fabricantes")
-                   #LLAMAR A LA FUNCION Top10_principiosActivos_producidos_por_fabricantes                   
-                    #st.text(Top10_principiosActivos_producidos_por_fabricantes)   
+                   
+                    result = db.top10PrincipiosActivosProducidosPorMasFabricantes()
+                    if result:
+                        for resultado in result:
+                            principioActivo, numFabricantes = resultado
+                            st.text(f"Principio Activo: {principioActivo}, Número de Fabricantes: {numFabricantes}")
+                    else:
+                        st.text("No se encontraron resultados.")
+
 
         #///////////////////////////////////Consulta 9////////////////////////////////////////////////////////////////////////////////////////
                
@@ -330,16 +353,190 @@ def main():
                     st.subheader("Consulta 9 -  Productos de un fabricante que actualmente no están en la CCSS.")
                         # Agregar una entrada de texto 
                     fabricante = st.text_input("Ingresa el nombre del fabricante:")
+    elif choice == "CRUD Medicamento":
+        st.subheader("Opciones de CRUD Medicamento")
+        accion = st.selectbox("Selecciona un opción", ["Insertar Medicamento", "Modificar Medicamento", "Consultar Medicamento", "Eliminar Medicamento"])
+
+        if accion:
+                if accion == "Insertar Medicamento":
+                    st.subheader("Insertar Medicamento")
+
+                    nombre_producto = st.text_input("Nombre del Producto Farmacéutico: ")
+                    presentacion = st.text_input("Presentación: ")
+                    nombre_generico = st.text_input("Nombre Genérico: ")
+                    precio_maximo = st.text_input("Precio Máximo de Venta: ")
+                    codigo_medicamento = st.text_input("Código de Medicamento: ")
+                    medicamento_huerfano = st.selectbox("Medicamento Huérfano", ["Sí", "No"])
+                    estado = st.selectbox("Estado", ["ALTA", "BAJA"])
+                    tipo_farmaco = st.text_input("Tipo de Fármaco: ")
+                    nombre_laboratorio = st.text_input("Nombre del Laboratorio Ofertante: ")
+                    precio_venta = st.text_input("Precio de Venta con IVA en Euros: ")
+                    principio_activo = st.text_input("Principio Activo o Asociación de Principios Activos: ")
+                    tratamiento_largo = st.selectbox("Tratamiento de Larga Duración", ["Sí", "No"])
+                    precio_unitario = st.text_input("Precio de unitario: ")
+
+                    medicamento_data = {
+                        "Nombre_del_producto_farmacéutico": nombre_producto,
+                        "Presentacion": presentacion,
+                        "Nombre_Generico": nombre_generico,
+                        "Precio_maximo_de_venta_transaccion_final_comercial": precio_maximo,
+                        "Codigo_de_Medicamento": codigo_medicamento,
+                        "Medicamento_huerfano": medicamento_huerfano,
+                        "Estado": estado,
+                        "Tipo_de_fármaco": tipo_farmaco,
+                        "Nombre_del_laboratorio_ofertante": nombre_laboratorio,
+                        "Precio_venta_con_IVA_Euros": precio_venta,
+                        "Principio_activo_o_asociacion_de_principios_activos": principio_activo,
+                        "Tratamiento_de_larga_duracion": tratamiento_largo,
+                        "PRECIO_UNITARIO": precio_unitario
+                    }
+
+                    if st.button("Crear nodo de medicamento"):
+                        result = db.create_medicamento(medicamento_data)  # Asegúrate de que medicamento_data esté definido
+                        st.success("Nodo de medicamento creado con éxito. Resultado: " + str(result))
+
+                elif accion == "Modificar Medicamento":
+                    st.subheader("Modificar Medicamento")
+                    pass
+
+                elif accion == "Consultar Medicamento":
+                    st.subheader("Consultar Medicamento")
+                    nombre_producto = st.text_input("Nombre del Producto Farmacéutico: ")
+                    if st.button("Consultar nodo de medicamento"):
+                        medicamento = db.read_medicamento(nombre_producto)  # Asegúrate de que nombre_del_producto_farmacéutico esté definido
+                        if medicamento:
+                            st.write("Nodo de medicamento leído:", medicamento)
+                        else:
+                            st.warning("El medicamento no se encontró en la base de datos.")
+
+                elif accion == "Eliminar Medicamento":
+                    st.subheader("Eliminar Medicamento")
+                    nombre_producto = st.text_input("Nombre del Producto Farmacéutico: ")
+                    if st.button("Eliminar nodo de medicamento"):
+                        db.delete_medicamento(nombre_producto)  # Asegúrate de que nombre_del_producto_farmacéutico esté definido
+                        st.success("Nodo de medicamento eliminado con éxito.")
+
+                else:
+                    st.warning("Por favor, seleccione una opción.")
+        
+    elif choice == "CRUD Laboratorio":
+        st.subheader("Opciones de CRUD Laboratorio")
+        accion = st.selectbox("Selecciona un opción", ["Insertar Laboratorio", "Modificar Laboratorio", "Consultar Laboratorio", "Eliminar Laboratorio"])
+
+        if accion:
+                if accion == "Insertar Laboratorio":
+                    st.subheader("Insertar Laboratorio")
+                    pass
+
+                elif accion == "Modificar Laboratorio":
+                    st.subheader("Modificar Laboratorio")
+                    pass
+
+                elif accion == "Consultar Laboratorio":
+                    st.subheader("Consultar Laboratorio")
+                    pass
+
+                elif accion == "Eliminar Laboratorio":
+                    st.subheader("Eliminar Laboratorio")
+                    pass
+
+                else:
+                    st.warning("Por favor, seleccione una opción.")
+    
+    elif choice == "CRUD Fabricante":
+        st.subheader("Opciones de CRUD Fabricante")
+        accion = st.selectbox("Selecciona un opción", ["Insertar Fabricante", "Modificar Fabricante", "Consultar Fabricante", "Eliminar Fabricante"])
+
+        if accion:
+                if accion == "Insertar Fabricante":
+                    st.subheader("Insertar Fabricante")
+                    pass
+
+                elif accion == "Modificar Fabricante":
+                    st.subheader("Modificar Fabricante")
+                    pass
+
+                elif accion == "Consultar Fabricante":
+                    st.subheader("Consultar Fabricante")
+                    pass
+
+                elif accion == "Eliminar Fabricante":
+                    st.subheader("Eliminar Fabricante")
+                    pass
+
+                else:
+                    st.warning("Por favor, seleccione una opción.")
+    
+    elif choice == "CRUD Principio Activo":
+        st.subheader("Opciones de CRUD Principio Activo")
+        accion = st.selectbox("Selecciona un opción", ["Insertar Principio Activo", "Modificar Principio Activo", "Consultar Principio Activo", "Eliminar Principio Activo"])
+
+        if accion:
+                if accion == "Insertar Principio Activo":
+                    st.subheader("Insertar Principio Activo")
+                    pass
+
+                elif accion == "Modificar Principio Activo":
+                    st.subheader("Modificar Principio Activo")
+                    pass
+
+                elif accion == "Consultar Principio Activo":
+                    st.subheader("Consultar Principio Activo")
+                    pass
+
+                elif accion == "Eliminar Principio Activo":
+                    st.subheader("Eliminar Principio Activo")
+                    pass
+
+                else:
+                    st.warning("Por favor, seleccione una opción.")
+    
+    elif choice == "CRUD Departamento":
+        st.subheader("Opciones de CRUD Departamento")
+        accion = st.selectbox("Selecciona un opción", ["Insertar Departamento", "Modificar Departamento", "Consultar Departamento", "Eliminar Departamento"])
+
+        if accion:
+                if accion == "Insertar Departamento":
+                    st.subheader("Insertar Departamento")
+                    pass
+
+                elif accion == "Modificar Departamento":
+                    st.subheader("Modificar Departamento")
+                    pass
+
+                elif accion == "Consultar Departamento":
+                    st.subheader("Consultar Departamento")
+                    pass
+
+                elif accion == "Eliminar Departamento":
+                    st.subheader("Eliminar Departamento")
+                    pass
+
+                else:
+                    st.warning("Por favor, seleccione una opción.")
+    
+    elif choice == "CRUD Categoria Medicamento":
+        st.subheader("Opciones de CRUD Categoria Medicamento")
+        accion = st.selectbox("Selecciona un opción", ["Insertar Categoria Medicamento", "Modificar Categoria Medicamento", "Consultar Categoria Medicamento", "Eliminar Categoria Medicamento"])
+
+        if accion:
+                if accion == "Insertar Categoria Medicamento":
+                    st.subheader("Insertar Categoria Medicamento")
+                    pass
+
+                elif accion == "Modificar Categoria Medicamento":
+                    st.subheader("Modificar Categoria Medicamento")
+                    pass
+
+                elif accion == "Consultar Categoria Medicamento":
+                    st.subheader("Consultar Categoria Medicamento")
+                    pass
+
+                elif accion == "Eliminar Categoria Medicamento":
+                    st.subheader("Eliminar Categoria Medicamento")
+                    pass
+        else:
+            st.warning("Por favor, seleccione una opción.") 
                     
-                    #if fabricante:
-                    # Llamar a la función para buscar lo solicitado
-                    # productos_no_enCCSS = buscar_proctos_NO_enCCSS_por_fabriacante(fabricante)
-                    
-                    #if productos_no_enCCSS:
-                    #    st.text("Productos encontrados:")
-                    #    for productos in productos_no_enCCSS:
-                    #        st.text(productos)
-                    #    else:
-                    #     st.text("No se encontraron productos.")
                     
 main()  # Llamar a la función main() para iniciar la aplicación

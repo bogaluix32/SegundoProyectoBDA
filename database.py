@@ -525,3 +525,64 @@ def top10PrincipiosActivosProducidosPorMasFabricantes():
 
 #Consulta 6 y 9 la tiene agus
 #Consulta 7 falta
+
+#Para limpiar la base de datos
+def clean_database():
+    
+    with GraphDatabase.driver(URI, auth=AUTH) as driver:
+        with driver.session() as session:
+            # Ejecuta consultas Cypher para eliminar todos los nodos y relaciones
+            session.write_transaction(delete_all_relationships)
+            session.write_transaction(delete_all_nodes)
+
+def delete_all_nodes(tx):
+    # Consulta Cypher para eliminar todos los nodos
+    query = "MATCH (n) DETACH DELETE n"
+    tx.run(query)
+
+def delete_all_relationships(tx):
+    # Consulta Cypher para eliminar todas las relaciones
+    query = "MATCH ()-[r]-() DELETE r"
+    tx.run(query)
+
+# Función para crear un nuevo nodo de medicamento
+def aux_create_medicamento(tx, medicamento_data):
+    query = (
+        "CREATE (m:Medicamento $medicamento_data)"
+        "RETURN m"
+    )
+    return tx.run(query, medicamento_data=medicamento_data).single()
+
+# Función para leer un nodo de medicamento por nombre
+def aux_read_medicamento(tx, nombre_del_producto_farmacéutico):
+    query = ("""
+        MATCH (m:Medicamento) WHERE m.Nombre_del_producto_farmacéutico = $nombre RETURN m"""
+    )
+    return tx.run(query, nombre=nombre_del_producto_farmacéutico).single()
+
+# Función para eliminar un nodo de medicamento por nombre
+def aux_delete_medicamento(tx, nombre_del_producto_farmacéutico):
+    query = """
+        MATCH (m:Medicamento) WHERE m.Nombre_del_producto_farmacéutico = $nombre RETURN m
+    """
+    tx.run(query, nombre=nombre_del_producto_farmacéutico)
+
+# Función para crear un nodo de medicamento
+def create_medicamento(medicamento_data):
+    with GraphDatabase.driver(URI, auth=AUTH) as driver:
+        with driver.session() as session:
+            result = session.write_transaction(aux_create_medicamento, medicamento_data)
+            return result
+
+# Función para leer un nodo de medicamento por nombre
+def read_medicamento(nombre_del_producto_farmacéutico):
+    with GraphDatabase.driver(URI, auth=AUTH) as driver:
+        with driver.session() as session:
+            medicamento = session.read_transaction(aux_read_medicamento, nombre_del_producto_farmacéutico)
+            return medicamento
+
+# Función para eliminar un nodo de medicamento por nombre
+def delete_medicamento(nombre_del_producto_farmacéutico):
+    with GraphDatabase.driver(URI, auth=AUTH) as driver:
+        with driver.session() as session:
+            session.write_transaction(aux_delete_medicamento, nombre_del_producto_farmacéutico)
