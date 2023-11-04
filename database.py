@@ -523,8 +523,58 @@ def top10PrincipiosActivosProducidosPorMasFabricantes():
             
             return resultados
 
-#Consulta 6 y 9 la tiene agus
-#Consulta 7 falta
+def consultaNumeroSeis():
+    with GraphDatabase.driver(URI, auth=AUTH) as driver:
+        with driver.session() as session:
+            result = session.run("""
+                MATCH (x:Medicamento)
+                WHERE x.Medicamento_huerfano = 'SI'
+                RETURN x.Principio_activo_o_asociacion_de_principios_activos as `Principio Activo`,
+                x.Nombre_del_producto_farmacéutico as `Medicamento`
+                LIMIT 10
+            """)
+
+            resultados = []
+            for record in result:
+                principioActivo = record["Principio Activo"]
+                nombreMedicamento = record["Medicamento"]
+                resultados.append((principioActivo, nombreMedicamento))
+
+            return resultados
+
+def consultaNumeroSiete():
+    resultados = []  # Inicializamos una lista vacía para almacenar los resultados
+
+    with GraphDatabase.driver(URI, auth=AUTH) as driver:
+        with driver.session() as session:
+            result = session.run("""
+                MATCH (x:Medicamento)-[:PERTENECE_A]->(f:`Categoria Medicamento`)
+                WHERE x.Tratamiento_de_larga_duracion = 'SI' AND x.Codigo_de_Medicamento <> '0'
+                RETURN x.Nombre_del_producto_farmacéutico as Medicamento, f.DESCRIPCIÓN as Tipo_de_Padecimientos
+            """)
+
+            for record in result:
+                # Para cada registro en el resultado, agregamos una tupla a la lista resultados
+                resultados.append(
+                    (record["Medicamento"], record["Tipo_de_Padecimientos"]))
+
+    return resultados
+
+def buscar_medicamentos_por_laboratorioConsulta9(fabricante):
+    with GraphDatabase.driver(URI, auth=AUTH) as driver:
+        with driver.session() as session:
+            result = session.run(
+                "MATCH (m:Medicamento) "
+                "WHERE m.Nombre_del_laboratorio_ofertante = $fabricante AND m.Codigo_de_Medicamento = '0'"
+                "RETURN m.`Nombre_del_producto_farmacéutico`",
+                fabricante=fabricante
+            )
+
+            # Recopila los nombres de los medicamentos en una lista
+            medicamentos = [record["m.`Nombre_del_producto_farmacéutico`"]
+                            for record in result]
+
+            return medicamentos
 
 #Para limpiar la base de datos
 def clean_database():
@@ -586,3 +636,4 @@ def delete_medicamento(nombre_del_producto_farmacéutico):
     with GraphDatabase.driver(URI, auth=AUTH) as driver:
         with driver.session() as session:
             session.write_transaction(aux_delete_medicamento, nombre_del_producto_farmacéutico)
+

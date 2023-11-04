@@ -325,13 +325,36 @@ def main():
               
                 elif consulta_elegida == "Consulta 6":
                     st.subheader("Consulta 6 - Top 10 de principios activos que han sido suspendidos para uso comercial")
-                   #LLAMAR A LA FUNCION Top10_principiosActivos
+                   
+                    resultados = db.consultaNumeroSeis()
+
+                    if resultados:
+                        st.text("Medicamentos Huérfanos:")
+                        for resultado in resultados:
+                            principio_activo = resultado[0]
+                            nombre_medicamento = resultado[1]
+
+                            st.write(f"Principio Activo: {principio_activo}")
+                            st.write(f"Medicamento: {nombre_medicamento}")
+                    else:
+                        st.text("No se encontraron medicamentos huérfanos.")
          #///////////////////////////////////Consulta 7////////////////////////////////////////////////////////////////////////////////////////
               
                 elif consulta_elegida == "Consulta 7":
                     st.subheader("Consulta 7 - Lista de los medicamentos para tratamientos de larga duración que se encuentren disponibles en la CCSS y los posibles reemplazos para él")
-                   #LLAMAR A LA FUNCION tratamientos_larga_duracion
-                   # st.text(tratamientos_larga_duracion)
+                    resultados = db.consultaNumeroSiete()
+
+                    if resultados:
+                        st.text(
+                            "Medicamentos medicamentos para tratamientos de larga duración:")
+                        for resultado in resultados:
+                            Medicamento = resultado[0]
+                            Tipo_de_padecimientos = resultado[1]
+
+                            st.write(f"Principio Activo: {Medicamento}")
+                            st.write(f"Medicamento: {Tipo_de_padecimientos}")
+                    else:
+                        st.text("No se encontraron medicamentos huérfanos.")
 
         #///////////////////////////////////Consulta 8////////////////////////////////////////////////////////////////////////////////////////
               
@@ -351,8 +374,20 @@ def main():
                
                 elif consulta_elegida == "Consulta 9":
                     st.subheader("Consulta 9 -  Productos de un fabricante que actualmente no están en la CCSS.")
-                        # Agregar una entrada de texto 
-                    fabricante = st.text_input("Ingresa el nombre del fabricante:")
+                    
+                    fabricante = st.text_input(
+                    "Ingresa el nombre del Fabricante:")
+
+                    resultados = db.buscar_medicamentos_por_laboratorioConsulta9(fabricante)
+
+                    if resultados:
+                        st.text("Medicamentos")
+                        for resultado in resultados:
+                            st.write(resultado)
+                    else:
+                        st.text("No se encontraron resultados.")
+
+
     elif choice == "CRUD Medicamento":
         st.subheader("Opciones de CRUD Medicamento")
         accion = st.selectbox("Selecciona un opción", ["Insertar Medicamento", "Modificar Medicamento", "Consultar Medicamento", "Eliminar Medicamento"])
